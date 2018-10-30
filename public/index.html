@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html ng-app="exambazaar">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/ng-table@2.0.2/bundles/ng-table.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+    
+<style>
+    .some-pdf-container { width: 100%; height: 100%; }
+    .min10vh{
+        min-height: 20vh;
+    }
+    .showBorder{
+        border: 2px solid red;
+    }
+    .width100{
+        width: 100%;
+    }
+    .min100vh{
+        min-height: 100vh;
+    }
+    .padding5{
+        padding: 5px;
+    }
+    .red{
+        background: red;
+    }
+    .bottomBorder{
+        border-bottom: 1px solid black;
+    }
+    .headerBottomBorder{
+        border-bottom: 3px solid black;
+    }
+    .font12{
+        font-size: 12px;
+    }
+    .marginleft5{
+        margin-left: 65px;
+    }
+    .autocomplete {
+        position: relative;
+        display: inline-block;
+    }
+    .paddingTB40{
+        padding: 40px 0px;
+    }
+    .paddingTB10{
+        padding: 10px 0px;
+    }
+    .ng-table-scrollcontainer {
+   width: 300px;
+   overflow-x:scroll;
+   margin-left:10em;
+   overflow-y:visible;
+}
+.ng-table-fixedcolumn1 {
+   max-width:150px;
+   overflow-x: hidden;
+   left: auto;
+   top:auto;
+}
+.ng-table-fixedcolumn2{
+   /*  Description */
+   min-width:600px;
+   overflow-x: hidden;
+   left:auto;
+   top:auto;
+}
+.ng-table-fixedcolumn4{
+   /*  Description */
+   min-width:250px;
+   overflow-x: hidden;
+   left:auto;
+   top:auto;
+}
+.ng-table-fixedcolumn3{
+   /*  Links/Websites */
+   max-width:200px;
+   left:auto;
+   top:auto;
+}
+.ng-table-fixedcolumn3_cell{
+   max-width:200px;
+   left:auto;
+   top:auto;
+   word-wrap: break-word;
+   white-space: normal;
+   /*overflow-x: scroll;*/
+}
+    body{
+        padding: 20px;
+    }
+</style>    
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-messages.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+<link rel="stylesheet" href="js/angular-ui-notification.min.css">
+<script src="js/angular-ui-notification.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+    <script src="https://unpkg.com/ng-table@2.0.2/bundles/ng-table.min.js"></script>
+<script src="app.js"></script>
+    
+<body ng-controller="instaCtrl">
+    <div layout="row" layout-align="start center">
+        <div flex>
+        <md-input-container class="md-block" style="margin-right: 20px;">
+          <label>Populate hashtags</label>
+          <textarea ng-model="hashtags" md-maxlength="150" rows="5"></textarea>
+        </md-input-container>
+        </div>
+        <div flex>
+        <md-checkbox ng-model="topPosts" aria-label="Top Posts" style="margin-right: 20px;">
+            Top Posts
+          </md-checkbox>
+        </div>
+        <div flex>
+        <md-input-container style="margin-right: 20px;">
+            <label style="font-size: 15px;"><div>Number of most recent posts</div> 
+                <div>to explore for each hashtag </div><div>(Please keep it a </div><div>multiple of 3 to avoid</div> <div>undesired results.)</div></label>
+        <input ng-model="noOfPosts" md-maxlength="3">
+      </md-input-container>
+        </div>
+        <div flex>
+        <md-checkbox ng-model="toFollow" aria-label="Want to follow" style="margin-right: 20px;">
+            To Follow
+          </md-checkbox>
+        </div>
+        <div flex>
+        <md-checkbox ng-model="toLike" aria-label="Top Posts" style="margin-right: 20px;">
+            To Like
+          </md-checkbox>
+        </div>
+        <div flex>
+        <md-checkbox ng-model="toUnfollow" aria-label="To unfollow later" style="margin-right: 20px;">
+            To Unfollow: {{ toUnfollow }}
+          </md-checkbox>
+        </div>
+        <div flex>
+        <md-button class="md-raised md-primary" ng-click="save()">Save</md-button>
+        </div>
+    </div>
+    <div layout="column" layout-align="start start">
+        <table hscroll-class="ng-table-scrollcontainer" ng-table="allHashTagsTable" class="table table-bordered table-striped width100" show-filter="true">
+            <tr ng-repeat="thisHashtag in $data">
+                <td title="'Date'" sortable="'_created'">
+                    {{thisHashtag.created}}</td>
+                <td title="'Hahstags'"><div ng-repeat="hashtag in thisHashtag.hashTags">
+                    <span>{{hashtag}}</span>
+                    </div>
+                </td>
+                <td title="'Explored'">
+                    {{thisHashtag.explored}}</td>
+                <td title="'Posts'">
+                    {{thisHashtag.postsToExplore}}</td>
+                <td title="'Top Posts'">
+                    {{thisHashtag.topPosts}}</td>
+                <td title="'Follow All'">
+                    {{thisHashtag.toFollow}}</td>
+                <td title="'Like All'">
+                    {{thisHashtag.toLike}}</td>
+                <td title="'Successfully Followed'">
+                    {{thisHashtag.successfullFollows}}</td>
+                <td title="'Already Followed'">
+                    {{thisHashtag.alreadyFollowed}}</td>
+                <td title="'Successfully Liked'">
+                    {{thisHashtag.successfullLikes}}</td>
+                <td title="'Followed Back'">
+                    {{thisHashtag.followBacks}}</td>
+                <td title="'Unfollowed'">
+                    {{thisHashtag.unfollowed}}</td>
+                <td title="'Archived'">
+                    {{thisHashtag.archived}}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
